@@ -1,20 +1,22 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from 'next/link'
+import Image from 'next/image'
 
 const Logo = () => {
   return (
-    <div className="bg-neutral-50 h-fit">
-      <nav className="relative w-auto h-1/8 ml-2 pt-3 pb-3">
-        <Link href="/login" className="object-cover">
-          <Image 
+    <header className="bg-neutral-50 border-b border-slate-200">
+      <nav className="h-16 px-4 flex items-center">
+        <Link href="/login" className="flex items-center gap-3">
+          <Image
             src="/LogoChatrigo1.png"
-            alt="Logo"
-            fill={true}
+            alt="Chatrigo"
+            width={140}
+            height={40}
             className="object-contain"
-            />
+            priority
+          />
         </Link>
       </nav>
-    </div>
+    </header>
   )
 }
 

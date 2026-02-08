@@ -1,14 +1,51 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema for Supabase Postgres
+// - User: for email/password auth (optional if you use Supabase Auth)
+// - ChatSession: one conversation shown in the sidebar
+// - Message: chat bubbles inside a ChatSession
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MessageRole {
+  user
+  assistant
+}
+
+model ChatSession {
+  id            String    @id @default(uuid()) @db.Uuid
+
+  /// Supabase Auth user id (auth.users.id)
+  userId        String    @db.Uuid
+
+  // Shown in sidebar
+  title         String
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastMessageAt DateTime? // helpful for sorting sidebar quickly
+
+  messages      Message[]
+
+  @@index([userId, updatedAt])
+  @@index([userId, lastMessageAt])
+}
+
+model Message {
+  id         String      @id @default(uuid()) @db.Uuid
+  sessionId  String      @db.Uuid
+  session    ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  role       MessageRole
+  content    String
+
+  createdAt  DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
 }
