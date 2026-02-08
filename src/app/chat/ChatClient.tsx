@@ -92,7 +92,18 @@ const ChatClient = ({ initialConversations }: Props) => {
 
       if (!res.ok) {
         const err = await res.json().catch(() => null)
-        throw new Error(err?.error ?? 'Failed to send message')
+        const details =
+          typeof err?.details === 'string'
+            ? err.details
+            : err?.details
+              ? JSON.stringify(err.details)
+              : ''
+
+        throw new Error(
+          [err?.error ?? 'Failed to send message', details].filter(Boolean).join(
+            '\n',
+          ),
+        )
       }
 
       const data = (await res.json()) as ChatApiResponse
