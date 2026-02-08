@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
 
     // Generated code
     "src/generated/**",
+
+    // Prisma seed script (node/cjs)
+    "prisma/seed.cjs",
   ]),
 ]);
 
