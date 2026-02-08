@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
-import Logo from '@components/Logo'
+import AppHeader from '@components/AppHeader'
 import ChatHistoryItem from '@components/ChatHistoryItem'
 
 type ChatMessage = {
@@ -112,7 +112,7 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-300">
-      <Logo />
+      <AppHeader />
 
       {/* History sidebar (left) + Chat bubbles (right) */}
       <div className="flex grow gap-2 p-2 min-h-0">
