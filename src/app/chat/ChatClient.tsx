@@ -54,6 +54,41 @@ const ChatClient = ({ initialConversations }: Props) => {
     })
   }, [conversations])
 
+  async function createNewChat() {
+    if (sending) return
+    setSending(true)
+    try {
+      const res = await fetch('/api/chat/session', { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.error ?? 'Failed to create chat')
+      }
+
+      const data = (await res.json()) as {
+        id: string
+        title: string
+        createdAt: number
+      }
+
+      const newConversation: ConversationDTO = {
+        id: data.id,
+        title: data.title,
+        avatarUrl: '/LogoChatrigo3.png',
+        messages: [],
+      }
+
+      setConversations((prev) => {
+        // If the UI is currently showing the placeholder empty conversation, replace it.
+        const withoutPlaceholder = prev.filter((c) => c.id !== 'empty')
+        return [newConversation, ...withoutPlaceholder]
+      })
+      setActiveConversationId(data.id)
+      setInput('')
+    } finally {
+      setSending(false)
+    }
+  }
+
   async function sendMessage(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     const trimmed = input.trim()
@@ -136,9 +171,22 @@ const ChatClient = ({ initialConversations }: Props) => {
       <div className="flex grow gap-2 p-2 min-h-0">
         {/* Sidebar */}
         <aside className="bg-neutral-50 w-80 max-w-[35%] rounded-lg flex flex-col min-h-0">
-          <div className="px-4 py-3 border-b border-slate-200">
-            <div className="text-slate-800 font-semibold">Chat history</div>
-            <div className="text-xs text-slate-500">Select a conversation</div>
+          <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-2">
+            <div>
+              <div className="text-slate-800 font-semibold">Chat history</div>
+              <div className="text-xs text-slate-500">Select a conversation</div>
+            </div>
+
+            <button
+              type="button"
+              onClick={createNewChat}
+              disabled={sending}
+              // Tailwind should style this, but keep a small inline fallback so it never looks invisible.
+              style={{ backgroundColor: '#2563eb', color: 'white' }}
+              className="shrink-0 h-9 px-3 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-500 disabled:opacity-60 border border-blue-700 shadow-sm"
+            >
+              New chat
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-2">
